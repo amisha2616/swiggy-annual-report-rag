@@ -32,7 +32,6 @@ The system allows users to ask natural language questions and receive accurate, 
 # 🏗 System Architecture
 
 ```
-graph TD
     A[User Query] --> B[FAISS Semantic Retrieval]
     B --> C[Top-K Relevant Chunks]
     C --> D[Context Injection into Groq LLM]
@@ -55,7 +54,6 @@ FAISS (Vector Store)
 SentenceTransformers (all-MiniLM-L6-v2)
 
 Groq API (llama-3.1-8b-instant) 
-
 ```
 
 ⚠ Note:
@@ -91,29 +89,25 @@ Place the Swiggy Annual Report PDF inside a data/ folder and run:
 
 Then open:
 `http://localhost:8501`
+
 ## 🧠 How It Works
+
 1️⃣ Document Processing
 
 Loads the Swiggy Annual Report PDF.
-
 Cleans and splits it into meaningful chunks.
-
 Stores metadata including page numbers.
 
 2️⃣ Embedding & Vector Storage
 
 Generates semantic embeddings using SentenceTransformers.
-
 Stores embeddings in FAISS for fast similarity search.
 
 3️⃣ Retrieval-Augmented Generation (RAG)
 
 Retrieves top-k semantically similar chunks.
-
 Injects retrieved context into Groq LLM.
-
 Enforces strict context-based answering.
-
 Displays supporting context and source pages.
 
 4️⃣ Question Answering Interface
