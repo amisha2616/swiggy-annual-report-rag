@@ -6,7 +6,7 @@ This project implements a Retrieval-Augmented Generation (RAG) based Question An
 The system allows users to ask natural language questions and receive accurate, context-grounded answers strictly derived from the document. It prevents hallucination by ensuring responses are generated only from retrieved document content.
 
 # 🚀 Features
-`📄 PDF Document Processing
+```📄 PDF Document Processing
 
 ✂️ Intelligent text chunking
 
@@ -24,25 +24,26 @@ The system allows users to ask natural language questions and receive accurate, 
 
 💻 Interactive Streamlit Web UI
 
-⏱ Response time tracking`
+⏱ Response time tracking
+```
 
 
 
 # 🏗 System Architecture
 
-
-`graph TD
+```
+graph TD
     A[User Query] --> B[FAISS Semantic Retrieval]
     B --> C[Top-K Relevant Chunks]
     C --> D[Context Injection into Groq LLM]
     D --> E[Grounded Answer Generation]
     E --> F[Answer + Source Pages + Context]`
 
-
+```
 # 🛠 Tech Stack
 
 
-`
+```
 Python
 
 Streamlit
@@ -55,8 +56,7 @@ SentenceTransformers (all-MiniLM-L6-v2)
 
 Groq API (llama-3.1-8b-instant) 
 
-`
-
+```
 
 ⚠ Note:
 .env, data/, and faiss_index/ are excluded for security and size reasons.
@@ -90,7 +90,6 @@ Place the Swiggy Annual Report PDF inside a data/ folder and run:
 `streamlit run app_streamlit.py`
 
 Then open:
-
 `http://localhost:8501`
 ## 🧠 How It Works
 1️⃣ Document Processing
@@ -118,21 +117,21 @@ Enforces strict context-based answering.
 Displays supporting context and source pages.
 
 4️⃣ Question Answering Interface
-
+```
 Interactive Streamlit UI.
 
 Displays:
 
-Final Answer
+-> Final Answer
 
-Source Pages
+-> Source Pages
 
-Supporting Context
+-> Supporting Context
 
-Semantic Similarity Score
+-> Semantic Similarity Score
 
-Response Time
-
+-> Response Time
+```
 
 ## 👩‍💻 Author
 
