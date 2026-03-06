@@ -11,7 +11,7 @@
 |-------|---------|
 | **Document** | Swiggy Annual Report FY 2023-24 |
 | **Format** | PDF (170 pages) |
-| **Source URL** | https://www.swiggy.com/about-us/ |
+| **Source URL** | [https://www.swiggy.com/about-us/](https://www.swiggy.com/corporate/wp-content/uploads/2024/10/Annual-Report-FY-2023-24-1.pdf) |
 
 ---
 
@@ -144,6 +144,24 @@ swiggy-rag/
 ├── .env.example                        ← copy to .env and add your key
 └── README.md
 ```
+
+---
+## 📸 Application Preview
+
+### 🖥️ Main Interface
+![Homepage](screenshots/homepage.png)
+
+---
+
+### 📊 Financial Query Example
+![Financial Example](screenshots/financial.png)
+
+![Governance Example](screenshots/Governance.png)
+
+---
+
+### 🛑 Hallucination Handling Example
+![Rejection Example](screenshots/Hallucination.png)
 
 ---
 
