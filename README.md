@@ -32,7 +32,6 @@ The system allows users to ask natural language questions and receive accurate, 
 # 🏗 System Architecture
 
 ```
-graph TD
     A[User Query] --> B[FAISS Semantic Retrieval]
     B --> C[Top-K Relevant Chunks]
     C --> D[Context Injection into Groq LLM]
