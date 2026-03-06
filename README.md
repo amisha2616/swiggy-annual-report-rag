@@ -149,19 +149,19 @@ swiggy-rag/
 ## 📸 Application Preview
 
 ### 🖥️ Main Interface
-![Homepage](screenshots/homepage.png)
+![Homepage](Screenshots/homepage.png)
 
 ---
 
 ### 📊 Financial Query Example
-![Financial Example](screenshots/financial.png)
+![Financial Example](Screenshots/financial.png)
 
-![Governance Example](screenshots/Governance.png)
+![Governance Example](Screenshots/Governance.png)
 
 ---
 
 ### 🛑 Hallucination Handling Example
-![Rejection Example](screenshots/Hallucination.png)
+![Rejection Example](Screenshots/Hallucination.png)
 
 ---
 
