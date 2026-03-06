@@ -1,138 +1,193 @@
-# 📊 Swiggy Annual Report RAG System
-🔎 Project Overview
+# Swiggy Annual Report — RAG Q&A System
 
-This project implements a Retrieval-Augmented Generation (RAG) based Question Answering system built on the Swiggy Annual Report (FY 2023–24).
+> ML Intern Assignment — Retrieval-Augmented Generation (RAG)  
+> Built on the **Swiggy Annual Report FY 2023-24**
 
-The system allows users to ask natural language questions and receive accurate, context-grounded answers strictly derived from the document. It prevents hallucination by ensuring responses are generated only from retrieved document content.
+---
 
-# 🚀 Features
-```📄 PDF Document Processing
+## 📄 Document Source
 
-✂️ Intelligent text chunking
+| Field | Details |
+|-------|---------|
+| **Document** | Swiggy Annual Report FY 2023-24 |
+| **Format** | PDF (170 pages) |
+| **Source URL** | [https://www.swiggy.com/about-us/](https://www.swiggy.com/corporate/wp-content/uploads/2024/10/Annual-Report-FY-2023-24-1.pdf) |
 
-🧠 Semantic embeddings using SentenceTransformers
+---
 
-🔍 Vector similarity search using FAISS
-
-🤖 LLM-powered answer generation via Groq API
-
-🛑 Strict context-based answering (no external knowledge)
-
-📑 Source page attribution
-
-📊 Semantic similarity score display
-
-💻 Interactive Streamlit Web UI
-
-⏱ Response time tracking
-```
-
-
-
-# 🏗 System Architecture
+## 🏗️ Architecture
 
 ```
-    A[User Query] --> B[FAISS Semantic Retrieval]
-    B --> C[Top-K Relevant Chunks]
-    C --> D[Context Injection into Groq LLM]
-    D --> E[Grounded Answer Generation]
-    E --> F[Answer + Source Pages + Context]`
-
-```
-# 🛠 Tech Stack
-
-
-```
-Python
-
-Streamlit
-
-LangChain
-
-FAISS (Vector Store)
-
-SentenceTransformers (all-MiniLM-L6-v2)
-
-Groq API (llama-3.1-8b-instant) 
-
+┌──────────────────────────────────────────────────────────┐
+│                    RAG PIPELINE                          │
+│                                                          │
+│  PDF ──► [ingest.py]                                     │
+│           │  1. Load PDF (PyPDFLoader, page by page)     │
+│           │  2. Clean text (regex preprocessing)         │
+│           │  3. Chunk (RecursiveCharacterTextSplitter)   │
+│           │  4. Embed (all-MiniLM-L6-v2, local/free)    │
+│           │  5. Store in FAISS index (saved to disk)     │
+│           ▼                                              │
+│  [app_streamlit.py]                                      │
+│           │  1. Load FAISS index                         │
+│           │  2. Accept user query via Streamlit UI       │
+│           │  3. Embed query → cosine similarity search   │
+│           │  4. Retrieve top-8 relevant chunks           │
+│           │  5. Build grounded prompt + call Groq LLM   │
+│           │     (Llama 3.1 8B — free API)               │
+│           │  6. Display answer + source pages + context  │
+└──────────────────────────────────────────────────────────┘
 ```
 
-⚠ Note:
-.env, data/, and faiss_index/ are excluded for security and size reasons.
+---
 
-# ⚙️ Installation & Setup
-1️⃣ Clone the Repository
-`git clone https://github.com/amisha2616/swiggy-annual-report-rag.git`
+## ✅ Functional Requirements
 
-`cd swiggy-annual-report-rag`
+| Requirement | Implementation |
+|-------------|----------------|
+| **Load PDF** | `PyPDFLoader` from LangChain — page-by-page extraction |
+| **Text preprocessing** | Regex cleaning: collapse whitespace, normalize line breaks, filter empty pages |
+| **Chunking + metadata** | `RecursiveCharacterTextSplitter` (900 chars, 150 overlap) — page number + source in metadata |
+| **Embeddings** | `sentence-transformers/all-MiniLM-L6-v2` — open-source, runs locally, no cost |
+| **Vector store** | FAISS — cosine similarity search, persisted to disk |
+| **Semantic search** | Top-8 chunks retrieved per query |
+| **RAG generation** | Groq API (Llama 3.1 8B) — strict context-only system prompt |
+| **No hallucination** | LLM instructed: answer ONLY from provided context |
+| **QA Interface** | Streamlit app — query input, final answer, source pages, supporting context |
 
-2️⃣ Create Virtual Environment
+---
 
-`python -m venv .venv`
+## 🚀 Setup & Run
 
-`.venv\Scripts\activate`
+### Step 1 — Clone & install
 
-3️⃣ Install Dependencies
-`pip install -r requirements.txt`
+```bash
+git clone <your-repo-url>
+cd swiggy-rag
 
-4️⃣ Add Groq API Key
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
 
-Create a .env file in the project root: `GROQ_API_KEY=your_groq_api_key_here`
-
-5️⃣ Build Vector Index
-
-Place the Swiggy Annual Report PDF inside a data/ folder and run:
-
-`python ingest.py`
-
-6️⃣ Run the Application
-`streamlit run app_streamlit.py`
-
-Then open:
-`http://localhost:8501`
-## 🧠 How It Works
-1️⃣ Document Processing
-
-Loads the Swiggy Annual Report PDF.
-
-Cleans and splits it into meaningful chunks.
-
-Stores metadata including page numbers.
-
-2️⃣ Embedding & Vector Storage
-
-Generates semantic embeddings using SentenceTransformers.
-
-Stores embeddings in FAISS for fast similarity search.
-
-3️⃣ Retrieval-Augmented Generation (RAG)
-
-Retrieves top-k semantically similar chunks.
-
-Injects retrieved context into Groq LLM.
-
-Enforces strict context-based answering.
-
-Displays supporting context and source pages.
-
-4️⃣ Question Answering Interface
-```
-Interactive Streamlit UI.
-
-Displays:
-
--> Final Answer
-
--> Source Pages
-
--> Supporting Context
-
--> Semantic Similarity Score
-
--> Response Time
+pip install -r requirements.txt
 ```
 
-## 👩‍💻 Author
+### Step 2 — Get a free Groq API key
 
-Developed as part of an AI/ML internship assignment.
+1. Go to **https://console.groq.com**
+2. Sign up (free, no credit card)
+3. Create an API key
 
+### Step 3 — Set up your `.env` file
+
+```bash
+cp .env.example .env
+# Open .env and paste your Groq API key
+```
+
+Your `.env` should look like:
+```
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
+```
+
+### Step 4 — Add the PDF
+
+```
+swiggy-rag/
+└── data/
+    └── Annual-Report-FY-2023-24.pdf    ← place here
+```
+
+### Step 5 — Build the vector index (run once)
+
+```bash
+python ingest.py
+```
+
+This will:
+- Parse the PDF and clean text
+- Create chunks with metadata
+- Generate embeddings locally
+- Save FAISS index to `faiss_index/`
+
+### Step 6 — Launch the app
+
+```bash
+streamlit run app_streamlit.py
+```
+
+Open **http://localhost:8501** in your browser.
+
+---
+
+## 💬 Example
+
+**Question:** What was Swiggy's total revenue in FY 2023-24?
+
+**Answer:** According to the standalone financial statements (Page 5), Swiggy's total income for FY 2023-24 was ₹70,166 million — comprising ₹63,723 million from business operations and ₹6,443 million from other income. On a consolidated basis, total income was ₹1,16,343 million.
+
+**Source Pages:** Page 5, Page 6
+
+---
+
+## 📁 Project Structure
+
+```
+swiggy-rag/
+├── data/
+│   └── Annual-Report-FY-2023-24.pdf   ← add manually
+├── faiss_index/                        ← generated by ingest.py
+│   ├── index.faiss
+│   └── index.pkl
+├── ingest.py                           ← Step 1: process PDF & build index
+├── app_streamlit.py                    ← Step 2: run the RAG app
+├── requirements.txt
+├── .env.example                        ← copy to .env and add your key
+└── README.md
+```
+
+---
+## 📸 Application Preview
+
+### 🖥️ Main Interface
+![Homepage](screenshots/homepage.png)
+
+---
+
+### 📊 Financial Query Example
+![Financial Example](screenshots/financial.png)
+
+![Governance Example](screenshots/Governance.png)
+
+---
+
+### 🛑 Hallucination Handling Example
+![Rejection Example](screenshots/Hallucination.png)
+
+---
+
+## 🛠️ Tech Stack
+
+| Component | Library | Notes |
+|-----------|---------|-------|
+| PDF Loading | `langchain PyPDFLoader` | Page-level with metadata |
+| Text Splitting | `RecursiveCharacterTextSplitter` | 900 chars, 150 overlap |
+| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` | Free, local, 384-dim |
+| Vector Store | `FAISS` | Cosine similarity, persisted |
+| LLM | `Groq — Llama 3.1 8B Instant` | Free API tier |
+| UI | `Streamlit` | Query input, answers, sources |
+| Env config | `python-dotenv` | API key management |
+
+---
+
+## 🔒 No-Hallucination Design
+
+The system prompt sent to the LLM:
+```
+Answer ONLY using the provided CONTEXT below.
+Do NOT use any outside knowledge.
+If the answer is not in the context, reply:
+"I could not find this information in the Swiggy Annual Report."
+Do NOT guess.
+```
+
+Every answer is traceable to retrieved chunks shown in the **Supporting Context** panel.
