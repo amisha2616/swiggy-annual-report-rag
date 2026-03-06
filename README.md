@@ -149,7 +149,7 @@ swiggy-rag/
 ## 📸 Application Preview
 
 ### 🖥️ Main Interface
-![Homepage](Screenshots/homepage.png)
+![Homepage](Screenshots/Homepage.png)
 
 ---
 
