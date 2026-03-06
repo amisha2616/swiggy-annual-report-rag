@@ -22,7 +22,9 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage
 
-
+# ─────────────────────────────────────────────
+# CONFIG
+# ─────────────────────────────────────────────
 INDEX_DIR  = "faiss_index"
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K      = 8   # number of chunks to retrieve
@@ -38,7 +40,9 @@ Rules:
 5. Cite page numbers when available.
 """
 
-
+# ─────────────────────────────────────────────
+# PAGE CONFIG & STYLING
+# ─────────────────────────────────────────────
 st.set_page_config(
     page_title="Swiggy Annual Report RAG",
     page_icon="📊",
@@ -79,7 +83,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
+# ─────────────────────────────────────────────
+# LOAD RESOURCES (cached — loaded once)
+# ─────────────────────────────────────────────
 @st.cache_resource
 def load_vectorstore():
     """Load FAISS index + embedding model."""
@@ -105,6 +111,9 @@ def load_llm():
     return ChatGroq(model="llama-3.1-8b-instant", temperature=0)
 
 
+# ─────────────────────────────────────────────
+# HELPER
+# ─────────────────────────────────────────────
 def format_context(docs) -> tuple[str, list[int]]:
     """Combine retrieved docs into a context string and collect page numbers."""
     context = ""
@@ -117,7 +126,9 @@ def format_context(docs) -> tuple[str, list[int]]:
     return context.strip(), sorted(pages)
 
 
-
+# ─────────────────────────────────────────────
+# UI — HEADER
+# ─────────────────────────────────────────────
 st.markdown('<div class="big-title">📊 Swiggy Annual Report RAG System</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">FY 2023-24 · Retrieval-Augmented Generation · Groq (Llama 3.1) · FAISS · HuggingFace Embeddings</div>', unsafe_allow_html=True)
 st.markdown("---")
@@ -125,6 +136,7 @@ st.markdown("---")
 # Load env vars (.env file)
 load_dotenv()
 
+# Load models
 vectorstore = load_vectorstore()
 llm         = load_llm()
 retriever   = vectorstore.as_retriever(
@@ -132,6 +144,9 @@ retriever   = vectorstore.as_retriever(
     search_kwargs={"k": TOP_K}
 )
 
+# ─────────────────────────────────────────────
+# UI — SIDEBAR (suggested questions)
+# ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown("### 💡 Try These Questions")
     suggested = [
@@ -154,7 +169,11 @@ with st.sidebar:
     st.markdown("**Model:** Llama 3.1 8B (Groq)")
     st.markdown("**Embeddings:** all-MiniLM-L6-v2")
 
+# ─────────────────────────────────────────────
+# UI — MAIN QUERY INPUT
+# ─────────────────────────────────────────────
 
+# Initialize session state keys
 if "query_input" not in st.session_state:
     st.session_state["query_input"] = ""
 if "auto_submit" not in st.session_state:
@@ -171,11 +190,14 @@ col1, col2 = st.columns([1, 5])
 with col1:
     submit = st.button("Submit", type="primary", use_container_width=True)
 
+# Trigger automatically when sidebar button was clicked
 if st.session_state.get("auto_submit"):
     st.session_state["auto_submit"] = False
     submit = True
 
-
+# ─────────────────────────────────────────────
+# RAG PIPELINE — on submit
+# ─────────────────────────────────────────────
 active_query = st.session_state.get("query_input", "").strip()
 
 if submit and active_query:
@@ -208,11 +230,11 @@ Answer clearly and concisely. Cite page numbers where possible.""")
             response  = llm.invoke(messages)
             answer    = response.content.strip()
 
-         
+            # ── Final Answer ──────────────────────────
             st.markdown('<div class="section-label">✅ Final Answer</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="answer-box">{answer}</div>', unsafe_allow_html=True)
 
-           
+            # ── Source Pages ──────────────────────────
             st.markdown('<div class="section-label">📄 Source Pages</div>', unsafe_allow_html=True)
             if pages:
                 badges = " ".join([f'<span class="page-badge">Page {p}</span>' for p in pages])
@@ -220,7 +242,7 @@ Answer clearly and concisely. Cite page numbers where possible.""")
             else:
                 st.write("No page numbers identified.")
 
-           
+            # ── Supporting Context (expandable) ───────
             with st.expander("🔍 Supporting Context — Top Retrieved Chunks"):
                 for i, doc in enumerate(docs[:4], 1):
                     pg = doc.metadata.get("page", 0) + 1
